@@ -1,52 +1,52 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Pixel Runer</title>
-        <style>
-            body {
-                margin: 0;
-                padding: 20px;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-                min-height: 100vh;
-                background: #f0f0f0;
-                font-family: Arial, sans-serif;
-            }
-            canvas {
-                display: block;
-                border: 2px solid black;
-            }
-            .controls {
-                margin-top: 15px;
-                padding: 10px 20px;
-                background: white;
-                border-radius: 8px;
-                box-shadow: 0 2px 4px rgba(red, green, blue, alpha);
-                font-size: 14px;
-            }
-            .controls strong {
-                color: #FF4444;
-            }
-            #shop {
-                position: fixed;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                background: white;
-                padding: 30px;
-                border-radius: 15px;
-                box-shadow: 0 4px 20px rgba(red, green, blue, alpha);
-                display: none;
-                x-index: 1000;
+<head>
+    <title>Pixel Runner</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+        canvas {
+            display: block;
+            border: 2px solid black;
+        }
+        .controls {
+            margin-top: 15px;
+            padding: 10px 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            font-size: 14px;
+        }
+        .controls strong {
+            color: #FF4444;
+        }
+        #shop {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            display: none;
+            z-index: 1000;
             max-width: 500px;
-         }
-         #shop h2 {
+        }
+        #shop h2 {
             margin-top: 0;
             color: #FF4444;
-         }
-         .weapon-item {
+        }
+        .weapon-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -55,16 +55,16 @@
             background: #f5f5f5;
             border-radius: 8px;
             border: 2px solid #ddd;
-         }
-         .weapon-item.owed {
+        }
+        .weapon-item.owned {
             background: #e8f5e9;
             border-color: #4CAF50;
-         }
-         .weapon-item.equipped {
+        }
+        .weapon-item.equipped {
             background: #fff3e0;
             border-color: #FF9800;
-         }
-         .weapon-btn {
+        }
+        .weapon-btn {
             padding: 8px 15px;
             background: #4CAF50;
             color: white;
@@ -72,15 +72,15 @@
             border-radius: 5px;
             cursor: pointer;
             font-weight: bold;
-         }
-         .weapon-btn:hover {
+        }
+        .weapon-btn:hover {
             background: #45a049;
-         }
-         .weapon-btn:disabled {
+        }
+        .weapon-btn:disabled {
             background: #ccc;
             cursor: not-allowed;
-         }
-         #closeShop {
+        }
+        #closeShop {
             margin-top: 20px;
             padding: 10px 20px;
             background: #FF4444;
@@ -90,18 +90,18 @@
             cursor: pointer;
             font-weight: bold;
             width: 100%;
-         }
-         #overlay {
-            position: fixed ;
+        }
+        #overlay {
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(red, green, blue, alpha);
+            background: rgba(0,0,0,0.5);
             display: none;
             z-index: 999;
-         }
-         #gameOver {
+        }
+        #gameOver {
             position: fixed;
             top: 50%;
             left: 50%;
@@ -109,20 +109,24 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             padding: 40px;
             border-radius: 20px;
-            box-shadow: 0 10px 40px rgba(red, green, blue, alpha);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
             display: none;
             z-index: 1000;
             text-align: center;
             color: white;
             min-width: 400px;
-         }
-         #gameOver h1 {
+        }
+        #gameOver h1 {
             font-size: 48px;
             margin: 0 0 20px 0;
-            color: #FF4444;
-            text-shadow: 3px 3px 0px rgba(red, green, blue, alpha);
-         }
-         .game-over-btn {
+            color: #ff4444;
+            text-shadow: 3px 3px 0px rgba(0,0,0,0.3);
+        }
+        #gameOver p {
+            font-size: 20px;
+            margin: 10px 0;
+        }
+        .game-over-btn {
             padding: 15px 30px;
             margin: 10px;
             font-size: 18px;
@@ -131,176 +135,669 @@
             cursor: pointer;
             font-weight: bold;
             transition: transform 0.2s;
-         }
-         .game-over-btn:hover {
+        }
+        .game-over-btn:hover {
             transform: scale(1.1);
-         }
-         #respawnBtn {
+        }
+        #respawnBtn {
             background: #4CAF50;
             color: white;
-         }
-         #restartBtn {
-            background: #4CAF50;
-            color: white;
-         }
-         #restartBtn {
+        }
+        #restartBtn {
             background: #FF9800;
             color: white;
-         }
-        </style>
-    </head>
-    <body>
-        <canvas id="game" width="600" height="300"></canvas>
-        <div>
-            <strong>W/A/S/D</strong> = Move | <strong>SPACE</strong> = Attack | <strong>SHIFT</strong> = Shop
+        }
+    </style>
+</head>
+<body>
+    <canvas id="game" width="600" height="300"></canvas>
+    <div class="controls">
+        <strong>W/A/S/D</strong> = Move | <strong>SPACE</strong> = Attack | <strong>SHIFT</strong> = Shop
+    </div>
+    
+    <div id="overlay"></div>
+    
+    <div id="gameOver">
+        <h1>GAME OVER</h1>
+        <p id="finalLevel">Level: 0</p>
+        <p id="finalScore">Score: 0</p>
+        <p id="finalCoins">Coins Collected: 0</p>
+        <div style="margin-top: 30px;">
+            <button id="respawnBtn" class="game-over-btn">Respawn (Keep Progress)</button>
+            <button id="restartBtn" class="game-over-btn">Restart Game</button>
         </div>
+    </div>
+    
+    <div id="shop">
+        <h2>⚔️ Weapon Shop</h2>
+        <p>Coins: <strong id="coinDisplay">0</strong> 💰</p>
+        <div id="weaponList"></div>
+        <button id="closeShop">Close Shop</button>
+    </div>
 
-        <div id="overlay"></div>
+    <script>
+        const canvas = document.getElementById('game');
+        const ctx = canvas.getContext('2d');
 
-        <div id="gameOver">
-            <h1>GAME OVER</h1>
-            <p id="finalLevel">Level: 0</p>
-            <p id="finalScore">Score: 0</p>
-            <p id="finalCoins">Coins Collected: 0</p>
-            <div style="margin-top: 30px;">
-                <button id="respawnBtn" class="game-over-btn">Respawn (Keep Progress)</button>
-                <button id="restartBtn" class="game-over-btn">Restart Game</button>
-            </div>
-        </div>
+        let player = { 
+            x: 50, 
+            y: 200, 
+            w: 30, 
+            h: 35,
+            vx: 0,
+            vy: 0,
+            speed: 3,
+            health: 100, 
+            maxHealth: 100,
+            attackCooldown: 0,
+            invincible: 0
+        };
+        
+        let monsters = [];
+        let projectiles = [];
+        let coins = [];
+        let score = 0;
+        let level = 1;
+        let animFrame = 0;
+        let playerCoins = 0;
+        let bossActive = false;
+        let boss = null;
+        let gamePaused = false;
 
-        <div id="shop">
-            <h2>⚔️ Weapon Shop</h2>
-            <p>Coins: <strong id="coinDisplay">0</strong> 💰</p>
-            <div id="weaponList"></div>
-            <button id="closeShop">Close Shop</button>
-        </div>
+        const weapons = {
+            fist: { name: "Fist", damage: 20, cooldown: 30, range: 40, cost: 0, owned: true, equipped: true },
+            sword: { name: "Sword", damage: 50, cooldown: 20, range: 50, cost: 50, owned: false, equipped: false },
+            axe: { name: "Axe", damage: 80, cooldown: 35, range: 45, cost: 150, owned: false, equipped: false },
+            gun: { name: "Gun", damage: 60, cooldown: 15, range: 200, cost: 250, owned: false, equipped: false, projectile: true },
+            laser: { name: "Laser Beam", damage: 100, cooldown: 40, range: 300, cost: 500, owned: false, equipped: false, projectile: true },
+            hammer: { name: "War Hammer", damage: 120, cooldown: 50, range: 55, cost: 750, owned: false, equipped: false }
+        };
 
-        <script>
-            const canvas = document.getElementById('game');
-            const ctx = canvas.getContext('2d');
+        let currentWeapon = 'fist';
 
-            let player = {
-                x: 50,
-                y: 200,
-                w: 30,
-                h: 35,
+        const levels = {
+            1: { bg: '#87CEEB', ground: '#90EE90', theme: 'Desert', nextLevel: 500 },
+            2: { bg: '#4A5D7F', ground: '#6B8E23', theme: 'Forest', nextLevel: 1000 },
+            3: { bg: '#2C1810', ground: '#8B7355', theme: 'Cave', nextLevel: 1500 },
+            4: { bg: '#1a0033', ground: '#4B0082', theme: 'Space', nextLevel: Infinity }
+        };
+
+        function spawnMonster() {
+            let side = Math.random() > 0.5 ? 'right' : 'top';
+            let x = side === 'right' ? 600 : Math.random() * 600;
+            let y = side === 'right' ? Math.random() * 250 : -40;
+            
+            monsters.push({
+                x: x,
+                y: y,
+                w: 35,
+                h: 40,
+                health: 30 + (level * 10),
+                maxHealth: 30 + (level * 10),
+                speed: 1 + (level * 0.3),
+                type: level,
+                attackCooldown: 0
+            });
+        }
+
+        function spawnBoss() {
+            bossActive = true;
+            boss = {
+                x: 500,
+                y: 100,
+                w: 80,
+                h: 100,
+                health: 200 + (level * 100),
+                maxHealth: 200 + (level * 100),
+                attackTimer: 0,
+                moveTimer: 0,
                 vx: 0,
-                vy: 0,
-                speed: 3,
-                health: 100,
-                maxHealth: 100,
-                attackCooldown: 0,
-                invincible: 0
+                vy: 1,
+                level: level
             };
+        }
 
-            let monsters = [];
-            let projectiles = [];
-            let coins = [];
-            let score = 0;
-            let level = 1;
-            let animFrame = 0;
-            let playerCoins = 0;
-            let bossActive = false;
-            let boss = null;
-            let gamePaused = false;
+        function drawHealthBar(x, y, width, health, maxHealth) {
+            ctx.fillStyle = '#000';
+            ctx.fillRect(x, y - 8, width, 5);
+            ctx.fillStyle = '#FF0000';
+            ctx.fillRect(x, y - 8, width, 5);
+            ctx.fillStyle = '#00FF00';
+            ctx.fillRect(x, y - 8, (health / maxHealth) * width, 5);
+        }
 
-            const weapons = {
-                fist: { name: "Fist", damage: 20, cooldown: 30, range: 40, cost: 0, owned: true, equipped: true },
-                sword: { name: "Sword", damage: 50, cooldown: 20, range: 50, cost: 50, owned: false, equipped: false },
-                axe: { name: "Axe", damage: 80, cooldown: 35, range: 45, cost: 150, owned: false, equipped: false },
-                hammer: { name: "War Hammer", damage: 60, cooldown: 15, range: 55, cost: 250, owned: false, equipped: false },
-                laser: { name: "Laser Beam", damage: 100, cooldown: 40, range: 300, cost: 500, owned: false, equipped: false, projectiles: true },
-                gun: { name: "Gun", Damage: 300, cooldown: 50, range: 200, cost: 950, owned: false, equipped: false, projectiles: true }
-            };
-
-            let currentWeapon = 'fist';
-
-            const levels = {
-                1: { bg: '#87ceeb', ground: '#90EE90', theme: 'Dessert', nextLevel: 500 },
-                2: { bg: '#4A5D7F', ground: '#6B8E23', theme: 'Forest', nextLevel: 1000 },
-                3: { bg: '#2C1810', ground: '#8B7355', theme: 'Cave', nextLevel: 1500 },
-                4: { bg: '#1a0033', ground: '#4B0082', theme: 'Space', nextLevel: infinity }
-            };
-
-            function spawnMonster() {
-                let side = Math.random() > 0.5 ? 'right' : 'top';
-                let x = side === 'right' ? 600 : Math.random() * 600;
-                let y = side === 'right' ? Math. random() * 250 : -40;
-
-                monsters.push({
-                    x: x,
-                    y: y,
-                    w: 35,
-                    h: 40,
-                    health: 30 + (level * 10),
-                    maxHealth: 30 + (level * 10),
-                    speed: 1 + (level * 0.3),
-                    type: level,
-                    attackCooldown: 0
-                })
+        function drawPlayer() {
+            animFrame++;
+            
+            // Draw health bar above player
+            drawHealthBar(player.x - 10, player.y - 10, 50, player.health, player.maxHealth);
+            
+            // Invincibility flash
+            if (player.invincible > 0 && Math.floor(animFrame / 5) % 2 === 0) {
+                ctx.globalAlpha = 0.5;
             }
-
-            function spawnBoss() {
-                bossActive = true;
-                boss = {
-                    x: 500,
-                    y: 100,
-                    w: 80,
-                    h: 100,
-                    health: 200 + (level * 100),
-                    maxHealth: 200 + (level * 100),
-                    attackTimer: 0,
-                    moveTimer: 0,
-                    vx: 0,
-                    vy: 1,
-                    level: level
-                };
-            }
-
-            function drawHealthBar(x, y, width, health, maxHealth) {
-                ctx.fillStyle = '#000';
-                ctx.fillRect(x, y - 8, width, 5);
-                ctx.fillStyle = '#FF0000';
-                ctx.fillRect(x, y - 8, width, 5);
-                ctx.fillStyle = '#00FF00';
-                ctx.fillRect(x, y - 8, (health / maxHealth) * width, 5);
-            }
-
-            function drawPlayer() {
-                animFrame++;
-
-                //Drawhealth bar above player
-                drawHealthBar(player.x - 10, player.y - 10, 50, player.health,player.maxHealth);
-
-                // Ivincibility flash
-                if (player.invincible > 0 && Math.floor(animFrame / 5) % 2 === 0) {
-                    ctx.globalAlpha = 0.5
-                }
-
-                // Shadow
-                ctx.fillStyle = 'rgba(0,0,0,0.3)';
-                ctx.fillRect(player.x + 5, player.y + player.h + 5, 20, 3);
-
-                // Body
-                ctx.fillStyle = '#FF4444';
-                ctx.fillRect(player.x + 3, player.y + 8, 24, 22);
-
-                // Body stripe
-                ctx.fillStyle = '#CC0000';
-                ctx.fillRect(player.x + 12, player.y + 12, 6, 14);
-
-                // Head
-                ctx.fillStyle = '#FFD4A3';
-                ctx.fillRect(player.x + 7, player.y - 2, 16, 12);
-
-                //Hair
+            
+            // Shadow
+            ctx.fillStyle = 'rgba(0,0,0,0.3)';
+            ctx.fillRect(player.x + 5, player.y + player.h + 5, 20, 3);
+            
+            // Body
+            ctx.fillStyle = '#FF4444';
+            ctx.fillRect(player.x + 3, player.y + 8, 24, 22);
+            
+            // Body stripe
+            ctx.fillStyle = '#CC0000';
+            ctx.fillRect(player.x + 12, player.y + 12, 6, 14);
+            
+            // Head
+            ctx.fillStyle = '#FFD4A3';
+            ctx.fillRect(player.x + 7, player.y - 2, 16, 12);
+            
+            // Hair
+            ctx.fillStyle = '#8B4513';
+            ctx.fillRect(player.x + 7, player.y - 5, 16, 4);
+            ctx.fillRect(player.x + 7, player.y - 6, 4, 2);
+            ctx.fillRect(player.x + 19, player.y - 6, 4, 2);
+            
+            // Eyes
+            ctx.fillStyle = '#FFF';
+            ctx.fillRect(player.x + 10, player.y + 2, 4, 4);
+            ctx.fillRect(player.x + 16, player.y + 2, 4, 4);
+            ctx.fillStyle = '#000';
+            ctx.fillRect(player.x + 11, player.y + 3, 2, 2);
+            ctx.fillRect(player.x + 17, player.y + 3, 2, 2);
+            
+            // Smile
+            ctx.fillRect(player.x + 11, player.y + 7, 8, 1);
+            ctx.fillRect(player.x + 11, player.y + 8, 2, 1);
+            ctx.fillRect(player.x + 17, player.y + 8, 2, 1);
+            
+            // Legs
+            ctx.fillStyle = '#0066CC';
+            ctx.fillRect(player.x + 8, player.y + 30, 6, 10);
+            ctx.fillRect(player.x + 16, player.y + 30, 6, 10);
+            
+            // Shoes
+            ctx.fillStyle = '#654321';
+            ctx.fillRect(player.x + 6, player.y + 40, 8, 3);
+            ctx.fillRect(player.x + 16, player.y + 40, 8, 3);
+            
+            // Arms
+            ctx.fillStyle = '#FFD4A3';
+            ctx.fillRect(player.x + 1, player.y + 12, 4, 12);
+            ctx.fillRect(player.x + 25, player.y + 12, 4, 12);
+            
+            // Draw equipped weapon
+            if (currentWeapon === 'sword') {
+                ctx.fillStyle = '#C0C0C0';
+                ctx.fillRect(player.x + 29, player.y + 10, 4, 20);
                 ctx.fillStyle = '#8B4513';
-                ctx.fillRect(player.x + 7, player.y - 5, 16, 4);
-                ctx.fillRect(player.x + 7, player.y - 6, 4, 2);
-                ctx.fillRect(player.x + 19)
-
-
+                ctx.fillRect(player.x + 28, player.y + 28, 6, 5);
+                ctx.fillStyle = '#FFD700';
+                ctx.fillRect(player.x + 31, player.y + 8, 3, 4);
+            } else if (currentWeapon === 'axe') {
+                ctx.fillStyle = '#8B4513';
+                ctx.fillRect(player.x + 30, player.y + 15, 3, 15);
+                ctx.fillStyle = '#696969';
+                ctx.fillRect(player.x + 26, player.y + 12, 10, 8);
+                ctx.fillRect(player.x + 27, player.y + 10, 8, 3);
+            } else if (currentWeapon === 'gun') {
+                ctx.fillStyle = '#404040';
+                ctx.fillRect(player.x + 29, player.y + 15, 10, 5);
+                ctx.fillRect(player.x + 31, player.y + 13, 4, 2);
+                ctx.fillStyle = '#808080';
+                ctx.fillRect(player.x + 35, player.y + 16, 2, 3);
+            } else if (currentWeapon === 'laser') {
+                // Laser gun (futuristic)
+                ctx.fillStyle = '#00FFFF';
+                ctx.fillRect(player.x + 29, player.y + 14, 12, 6);
+                ctx.fillStyle = '#0080FF';
+                ctx.fillRect(player.x + 32, player.y + 12, 4, 2);
+                ctx.fillStyle = '#00FF00';
+                ctx.fillRect(player.x + 37, player.y + 15, 4, 4);
+            } else if (currentWeapon === 'hammer') {
+                // War hammer
+                ctx.fillStyle = '#8B4513';
+                ctx.fillRect(player.x + 30, player.y + 18, 3, 16);
+                ctx.fillStyle = '#696969';
+                ctx.fillRect(player.x + 24, player.y + 14, 14, 10);
+                ctx.fillStyle = '#404040';
+                ctx.fillRect(player.x + 26, player.y + 16, 10, 6);
+            } else {
+                // Fist
+                ctx.fillStyle = '#FFD4A3';
+                ctx.fillRect(player.x + 29, player.y + 18, 6, 6);
+                ctx.fillStyle = '#FFC080';
+                ctx.fillRect(player.x + 30, player.y + 19, 4, 4);
             }
-        </script>
-    </body>
+            
+            // Attack animation
+            if (player.attackCooldown > 0 && player.attackCooldown > weapons[currentWeapon].cooldown - 10) {
+                ctx.fillStyle = 'rgba(255, 0, 0, 0.3)';
+                ctx.fillRect(player.x + player.w, player.y, weapons[currentWeapon].range, player.h);
+            }
+            
+            ctx.globalAlpha = 1.0;
+        }
+
+        function drawMonster(m) {
+            drawHealthBar(m.x, m.y - 5, m.w, m.health, m.maxHealth);
+            
+            // Ground monsters
+            ctx.fillStyle = '#8B0000';
+            ctx.fillRect(m.x + 8, m.y + 10, 20, 25);
+            ctx.fillStyle = '#FFD700';
+            ctx.fillRect(m.x + 10, m.y + 5, 16, 10);
+            ctx.fillStyle = '#FF0000';
+            ctx.fillRect(m.x + 13, m.y + 8, 3, 3);
+            ctx.fillRect(m.x + 19, m.y + 8, 3, 3);
+            ctx.fillStyle = '#000';
+            ctx.fillRect(m.x + 14, m.y + 9, 1, 1);
+            ctx.fillRect(m.x + 20, m.y + 9, 1, 1);
+            
+            // Sharp teeth
+            ctx.fillStyle = '#FFF';
+            ctx.fillRect(m.x + 13, m.y + 13, 2, 3);
+            ctx.fillRect(m.x + 16, m.y + 13, 2, 3);
+            ctx.fillRect(m.x + 19, m.y + 13, 2, 3);
+            
+            ctx.fillStyle = '#654321';
+            ctx.fillRect(m.x + 10, m.y + 35, 6, 8);
+            ctx.fillRect(m.x + 19, m.y + 35, 6, 8);
+        }
+
+        function drawBoss(b) {
+            drawHealthBar(b.x, b.y - 10, b.w, b.health, b.maxHealth);
+            
+            ctx.fillStyle = '#4B0000';
+            ctx.fillRect(b.x + 10, b.y + 20, 60, 70);
+            
+            ctx.fillStyle = '#8B0000';
+            ctx.fillRect(b.x + 20, b.y, 40, 30);
+            
+            ctx.fillStyle = '#000';
+            ctx.fillRect(b.x + 15, b.y - 10, 8, 12);
+            ctx.fillRect(b.x + 57, b.y - 10, 8, 12);
+            
+            ctx.fillStyle = Math.random() > 0.5 ? '#FF0000' : '#FFFF00';
+            ctx.fillRect(b.x + 28, b.y + 10, 8, 8);
+            ctx.fillRect(b.x + 44, b.y + 10, 8, 8);
+            
+            ctx.fillStyle = '#FFF';
+            for (let i = 0; i < 5; i++) {
+                ctx.fillRect(b.x + 25 + i * 6, b.y + 22, 3, 6);
+            }
+            
+            ctx.fillStyle = '#8B0000';
+            ctx.fillRect(b.x, b.y + 30, 15, 30);
+            ctx.fillRect(b.x + 65, b.y + 30, 15, 30);
+            
+            ctx.fillStyle = '#4B0000';
+            ctx.fillRect(b.x + 20, b.y + 90, 20, 15);
+            ctx.fillRect(b.x + 40, b.y + 90, 20, 15);
+        }
+
+        function drawCoin(c) {
+            ctx.fillStyle = '#FFD700';
+            ctx.fillRect(c.x + 2, c.y, 10, 14);
+            ctx.fillStyle = '#FFA500';
+            ctx.fillRect(c.x + 4, c.y + 2, 6, 10);
+            ctx.fillStyle = '#FFD700';
+            ctx.fillRect(c.x + 6, c.y + 4, 2, 6);
+        }
+
+        function attack() {
+            if (player.attackCooldown > 0) return;
+            
+            let weapon = weapons[currentWeapon];
+            player.attackCooldown = weapon.cooldown;
+            
+            if (weapon.projectile) {
+                projectiles.push({
+                    x: player.x + player.w,
+                    y: player.y + 15,
+                    w: currentWeapon === 'laser' ? 15 : 8,
+                    h: currentWeapon === 'laser' ? 5 : 3,
+                    vx: currentWeapon === 'laser' ? 12 : 8,
+                    vy: 0,
+                    damage: weapon.damage,
+                    type: currentWeapon
+                });
+            } else {
+                let attackX = player.x + player.w;
+                let attackY = player.y;
+                let attackRange = weapon.range;
+                
+                for (let m of monsters) {
+                    if (m.x < attackX + attackRange && m.x + m.w > attackX &&
+                        m.y < attackY + player.h && m.y + m.h > attackY) {
+                        m.health -= weapon.damage;
+                    }
+                }
+                
+                if (boss && boss.x < attackX + attackRange && boss.x + boss.w > attackX &&
+                    boss.y < attackY + player.h && boss.y + boss.h > attackY) {
+                    boss.health -= weapon.damage;
+                }
+            }
+        }
+
+        function openShop() {
+            gamePaused = true;
+            document.getElementById('shop').style.display = 'block';
+            document.getElementById('overlay').style.display = 'block';
+            updateShop();
+        }
+
+        function closeShop() {
+            gamePaused = false;
+            document.getElementById('shop').style.display = 'none';
+            document.getElementById('overlay').style.display = 'none';
+        }
+
+        function updateShop() {
+            document.getElementById('coinDisplay').textContent = playerCoins;
+            let weaponList = document.getElementById('weaponList');
+            weaponList.innerHTML = '';
+            
+            for (let [key, weapon] of Object.entries(weapons)) {
+                let div = document.createElement('div');
+                div.className = 'weapon-item';
+                if (weapon.equipped) div.className += ' equipped';
+                else if (weapon.owned) div.className += ' owned';
+                
+                let info = document.createElement('div');
+                info.innerHTML = `<strong>${weapon.name}</strong><br>
+                    Damage: ${weapon.damage} | Range: ${weapon.range} | Cooldown: ${weapon.cooldown}`;
+                
+                let btn = document.createElement('button');
+                btn.className = 'weapon-btn';
+                
+                if (weapon.equipped) {
+                    btn.textContent = 'Equipped';
+                    btn.disabled = true;
+                } else if (weapon.owned) {
+                    btn.textContent = 'Equip';
+                    btn.onclick = () => {
+                        for (let w in weapons) weapons[w].equipped = false;
+                        weapon.equipped = true;
+                        currentWeapon = key;
+                        updateShop();
+                    };
+                } else {
+                    btn.textContent = `Buy (${weapon.cost} coins)`;
+                    btn.disabled = playerCoins < weapon.cost;
+                    btn.onclick = () => {
+                        if (playerCoins >= weapon.cost) {
+                            playerCoins -= weapon.cost;
+                            weapon.owned = true;
+                            updateShop();
+                        }
+                    };
+                }
+                
+                div.appendChild(info);
+                div.appendChild(btn);
+                weaponList.appendChild(div);
+            }
+        }
+
+        function showGameOver() {
+            gamePaused = true;
+            document.getElementById('gameOver').style.display = 'block';
+            document.getElementById('overlay').style.display = 'block';
+            document.getElementById('finalLevel').textContent = 'Level: ' + level;
+            document.getElementById('finalScore').textContent = 'Score: ' + Math.floor(score);
+            document.getElementById('finalCoins').textContent = 'Coins Collected: ' + playerCoins;
+        }
+
+        function respawn() {
+            player.health = player.maxHealth;
+            player.x = 50;
+            player.y = 200;
+            player.vx = 0;
+            player.vy = 0;
+            player.invincible = 120;
+            monsters = [];
+            projectiles = [];
+            gamePaused = false;
+            document.getElementById('gameOver').style.display = 'none';
+            document.getElementById('overlay').style.display = 'none';
+        }
+
+        function restartGame() {
+            document.location.reload();
+        }
+
+        document.getElementById('closeShop').onclick = closeShop;
+        document.getElementById('respawnBtn').onclick = respawn;
+        document.getElementById('restartBtn').onclick = restartGame;
+
+        function update() {
+            if (gamePaused) {
+                requestAnimationFrame(update);
+                return;
+            }
+
+            if (score >= levels[level].nextLevel && level < 4 && !bossActive) {
+                spawnBoss();
+            }
+
+            canvas.style.background = levels[level].bg;
+            ctx.clearRect(0, 0, 600, 300);
+
+            // Move player
+            player.x += player.vx;
+            player.y += player.vy;
+            
+            // Keep player in bounds
+            if (player.x < 0) player.x = 0;
+            if (player.x > 600 - player.w) player.x = 600 - player.w;
+            if (player.y < 0) player.y = 0;
+            if (player.y > 300 - player.h - 15) player.y = 300 - player.h - 15;
+
+            if (player.attackCooldown > 0) player.attackCooldown--;
+            if (player.invincible > 0) player.invincible--;
+
+            // Draw ground
+            ctx.fillStyle = levels[level].ground;
+            ctx.fillRect(0, 285, 600, 15);
+            ctx.fillStyle = 'rgba(0,0,0,0.2)';
+            for (let i = 0; i < 600; i += 30) {
+                ctx.fillRect(i, 285, 2, 15);
+            }
+
+            // Update boss
+            if (boss) {
+                boss.moveTimer++;
+                boss.attackTimer++;
+                
+                // Boss moves toward player
+                if (boss.x > player.x) boss.vx = -0.5;
+                else if (boss.x < player.x) boss.vx = 0.5;
+                
+                boss.x += boss.vx;
+                
+                if (boss.moveTimer < 60) {
+                    boss.y += boss.vy;
+                } else if (boss.moveTimer < 120) {
+                    boss.y -= boss.vy;
+                } else {
+                    boss.moveTimer = 0;
+                }
+                
+                if (boss.attackTimer > 80) {
+                    spawnMonster();
+                    boss.attackTimer = 0;
+                }
+                
+                drawBoss(boss);
+                
+                if (boss.health <= 0) {
+                    playerCoins += 100 + (level * 50);
+                    boss = null;
+                    bossActive = false;
+                    level++;
+                    if (level <= 4) {
+                        monsters = [];
+                        score = 0;
+                    }
+                }
+                
+                // Boss collision
+                if (boss && boss.x < player.x + player.w && boss.x + boss.w > player.x &&
+                    boss.y < player.y + player.h && boss.y + boss.h > player.y) {
+                    if (player.invincible === 0) {
+                        player.health -= 10;
+                        player.invincible = 60;
+                    }
+                }
+            }
+
+            // Update projectiles
+            for (let i = projectiles.length - 1; i >= 0; i--) {
+                let p = projectiles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                
+                // Draw different projectile types
+                if (p.type === 'laser') {
+                    ctx.fillStyle = '#00FFFF';
+                    ctx.fillRect(p.x, p.y, p.w, p.h);
+                    ctx.fillStyle = '#FFFFFF';
+                    ctx.fillRect(p.x + 2, p.y + 1, p.w - 4, p.h - 2);
+                } else {
+                    ctx.fillStyle = '#FFD700';
+                    ctx.fillRect(p.x, p.y, p.w, p.h);
+                }
+                
+                if (p.x > 600 || p.x < 0 || p.y > 300 || p.y < 0) {
+                    projectiles.splice(i, 1);
+                    continue;
+                }
+                
+                for (let j = monsters.length - 1; j >= 0; j--) {
+                    let m = monsters[j];
+                    if (p.x < m.x + m.w && p.x + p.w > m.x &&
+                        p.y < m.y + m.h && p.y + p.h > m.y) {
+                        m.health -= p.damage;
+                        projectiles.splice(i, 1);
+                        break;
+                    }
+                }
+                
+                if (boss && p.x < boss.x + boss.w && p.x + p.w > boss.x &&
+                    p.y < boss.y + boss.h && p.y + p.h > boss.y) {
+                    boss.health -= p.damage;
+                    projectiles.splice(i, 1);
+                }
+            }
+
+            // Update coins
+            for (let i = coins.length - 1; i >= 0; i--) {
+                let c = coins[i];
+                drawCoin(c);
+                
+                if (c.x < player.x + player.w && c.x + c.w > player.x &&
+                    c.y < player.y + player.h && c.y + c.h > player.y) {
+                    playerCoins += 10;
+                    coins.splice(i, 1);
+                }
+            }
+
+            // Update monsters
+            for (let i = monsters.length - 1; i >= 0; i--) {
+                let m = monsters[i];
+                
+                // Monster AI - move toward player
+                if (m.x > player.x) m.x -= m.speed;
+                else if (m.x < player.x) m.x += m.speed;
+                
+                if (m.y > player.y) m.y -= m.speed;
+                else if (m.y < player.y) m.y += m.speed;
+                
+                drawMonster(m);
+                
+                if (m.health <= 0) {
+                    coins.push({ x: m.x, y: m.y, w: 14, h: 14 });
+                    playerCoins += 5;
+                    monsters.splice(i, 1);
+                } else {
+                    // Monster attacks player
+                    if (m.x < player.x + player.w && m.x + m.w > player.x &&
+                        m.y < player.y + player.h && m.y + m.h > player.y) {
+                        if (player.invincible === 0) {
+                            player.health -= 5;
+                            player.invincible = 60;
+                        }
+                    }
+                }
+            }
+
+            drawPlayer();
+
+            if (player.health <= 0) {
+                showGameOver();
+            }
+
+            score++;
+            ctx.fillStyle = '#000';
+            ctx.font = 'bold 20px Arial';
+            ctx.fillText('Score: ' + Math.floor(score), 10, 25);
+            ctx.fillText('Level: ' + level + ' - ' + levels[level].theme, 10, 50);
+            ctx.fillText('Coins: ' + playerCoins + ' 💰', 10, 75);
+            ctx.fillText('HP: ' + Math.floor(player.health) + '/' + player.maxHealth, 10, 100);
+            
+            if (level < 4 && !bossActive) {
+                let progress = (score / levels[level].nextLevel) * 100;
+                ctx.fillStyle = 'rgba(0,0,0,0.3)';
+                ctx.fillRect(10, 110, 200, 10);
+                ctx.fillStyle = '#4CAF50';
+                ctx.fillRect(10, 110, progress * 2, 10);
+            }
+
+            if (bossActive) {
+                ctx.fillStyle = '#FF0000';
+                ctx.font = 'bold 24px Arial';
+                ctx.fillText('BOSS FIGHT!', 250, 30);
+            }
+
+            if (!bossActive && Math.random() < 0.02) spawnMonster();
+
+            requestAnimationFrame(update);
+        }
+
+        let keysPressed = {};
+
+        document.addEventListener('keydown', e => {
+            keysPressed[e.code] = true;
+            
+            // Movement
+            if (e.code === 'KeyW') player.vy = -player.speed;
+            if (e.code === 'KeyS') player.vy = player.speed;
+            if (e.code === 'KeyA') player.vx = -player.speed;
+            if (e.code === 'KeyD') player.vx = player.speed;
+            
+            if (e.code === 'Space') {
+                e.preventDefault();
+                attack();
+            }
+
+            if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') {
+                e.preventDefault();
+                openShop();
+            }
+        });
+
+        document.addEventListener('keyup', e => {
+            keysPressed[e.code] = false;
+            
+            // Stop movement
+            if (e.code === 'KeyW' || e.code === 'KeyS') player.vy = 0;
+            if (e.code === 'KeyA' || e.code === 'KeyD') player.vx = 0;
+        });
+
+        update();
+    </script>
+</body>
 </html>
