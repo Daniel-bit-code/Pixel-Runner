@@ -276,6 +276,30 @@
                 if (player.invincible > 0 && Math.floor(animFrame / 5) % 2 === 0) {
                     ctx.globalAlpha = 0.5
                 }
+
+                // Shadow
+                ctx.fillStyle = 'rgba(0,0,0,0.3)';
+                ctx.fillRect(player.x + 5, player.y + player.h + 5, 20, 3);
+
+                // Body
+                ctx.fillStyle = '#FF4444';
+                ctx.fillRect(player.x + 3, player.y + 8, 24, 22);
+
+                // Body stripe
+                ctx.fillStyle = '#CC0000';
+                ctx.fillRect(player.x + 12, player.y + 12, 6, 14);
+
+                // Head
+                ctx.fillStyle = '#FFD4A3';
+                ctx.fillRect(player.x + 7, player.y - 2, 16, 12);
+
+                //Hair
+                ctx.fillStyle = '#8B4513';
+                ctx.fillRect(player.x + 7, player.y - 5, 16, 4);
+                ctx.fillRect(player.x + 7, player.y - 6, 4, 2);
+                ctx.fillRect(player.x + 19)
+
+
             }
         </script>
     </body>
