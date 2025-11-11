@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Pixel Runer</title>
+        <style>
+            body {
+                margin: 0;
+                padding: 20px;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                min-height: 100vh;
+                background: #f0f0f0;
+                font-family: Arial, sans-serif;
+            }
+            canvas {
+                display: block;
+                border: 2px solid black;
+            }
+            .controls {
+                margin-top: 15px;
+                padding: 10px 20px;
+                background: white;
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(red, green, blue, alpha);
+                font-size: 14px;
+            }
+            .controls strong {
+                color: #FF4444;
+            }
+            #shop {
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: white;
+                padding: 30px;
+                border-radius: 15px;
+                box-shadow: 0 4px 20px rgba(red, green, blue, alpha);
+                display: none;
+                x-index: 1000;
+            max-width: 500px;
+         }
+         #shop h2 {
+            margin-top: 0;
+            color: #FF4444;
+         }
+         .weapon-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            margin: 10px 0;
+            background: #f5f5f5;
+            border-radius: 8px;
+            border: 2px solid #ddd;
+         }
+         .weapon-item.owed {
+            background: #e8f5e9;
+            border-color: #4CAF50;
+         }
+         .weapon-item.equipped {
+            background: #fff3e0;
+            border-color: #FF9800;
+         }
+         .weapon-btn {
+            padding: 8px 15px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+         }
+         .weapon-btn:hover {
+            background: #45a049;
+         }
+         .weapon-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+         }
+         #closeShop {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: #FF4444;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+         }
+         #overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(red, green, blue, alpha);
+            display: none;
+            z-index: 999;
+         }
+         #gameOver {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(red, green, blue, alpha);
+            display: none;
+            z-index: 1000;
+            text-align: center;
+            color: white;
+            min-width: 400px;
+         }
+         #gameOver h1 {
+            font-size: 48px;
+            margin: 0 0 20px 0;
+            color: #FF4444;
+            text-shadow: 3px 3px 0px rgba(red, green, blue, alpha);
+         }
+         .game-over-btn {
+            padding: 15px 30px;
+            margin: 10px;
+            font-size: 18px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.2s;
+         }
+         .game-over-btn:hover {
+            transform: scale(1.1);
+         }
+         #respawnBtn {
+            background: #4CAF50;
+            color: white;
+         }
+         #restartBtn {
+            background: #4CAF50;
+            color: white;
+         }
+         #restartBtn {
+            background: #FF9800;
+            color: white;
+         }
+        </style>
+    </head>
+    <body>
+        <canvas id="game" width="600" height="300"></canvas>
+        <div>
+            <strong>W/A/S/D</strong> = Move | <strong>SPACE</strong> = Attack | <strong>SHIFT</strong> = Shop
+        </div>
+
+        <div id="overlay"></div>
+
+        <div id="gameOver">
+            <h1>GAME OVER</h1>
+            <p id="finalLevel">Level: 0</p>
+            <p id="finalScore">Score: 0</p>
+            <p id="finalCoins">Coins Collected: 0</p>
+            <div style="margin-top: 30px;">
+                <button id="respawnBtn" class="game-over-btn">Respawn (Keep Progress)</button>
+                <button id="restartBtn" class="game-over-btn">Restart Game</button>
+            </div>
+        </div>
+
+        <div id="shop">
+            <h2>⚔️ Weapon Shop</h2>
+            <p>Coins: <strong id="coinDisplay">0</strong> 💰</p>
+            <div id="weaponList"></div>
+            <button id="closeShop">Close Shop</button>
+        </div>
+
+        <script>
+            const canvas = document.getElementById('game');
+            const ctx = canvas.getContext('2d');
+
+            let player = {
+                x: 50,
+                y: 200,
+                w: 30,
+                h: 35,
+                vx: 0,
+                vy: 0,
+                speed: 3,
+                health: 100,
+                maxHealth: 100,
+                attackCooldown: 0,
+                invincible: 0
+            };
+
+            let monsters = [];
+            let projectiles = [];
+            let coins = [];
+            let score = 0;
+            let level = 1;
+            let animFrame = 0;
+            let playerCoins = 0;
+            let bossActive = false;
+            let boss = null;
+            let gamePaused = false;
+
+            const weapons = {
+                fist: { name: "Fist", damage: 20, cooldown: 30, range: 40, cost: 0, owned: true, equipped: true },
+                sword: { name: "Sword", damage: 50, cooldown: 20, range: 50, cost: 50, owned: false, equipped: false },
+                axe: { name: "Axe", damage: 80, cooldown: 35, range: 45, cost: 150, owned: false, equipped: false },
+                hammer: { name: "War Hammer", damage: 60, cooldown: 15, range: 55, cost: 250, owned: false, equipped: false },
+                laser: { name: "Laser Beam", damage: 100, cooldown: 40, range: 300, cost: 500, owned: false, equipped: false, projectiles: true },
+                gun: { name: "Gun", Damage: 300, cooldown: 50, range: 200, cost: 950, owned: false, equipped: false, projectiles: true }
+            };
+
+            let currentWeapon = 'fist';
+
+            const levels = {
+                1: { bg: '#87ceeb', ground: '#90EE90', theme: 'Dessert', nextLevel: 500 },
+                2: { bg: '#4A5D7F', ground: '#6B8E23', theme: 'Forest', nextLevel: 1000 },
+                3: { bg: '#2C1810', ground: '#8B7355', theme: 'Cave', nextLevel: 1500 },
+                4: { bg: '#1a0033', ground: '#4B0082', theme: 'Space', nextLevel: infinity }
+            };
+
+            function spawnMonster() {
+                let side = Math.random() > 0.5 ? 'right' : 'top';
+                let x = side === 'right' ? 600 : Math.random() * 600;
+                let y = side === 'right' ? Math. random() * 250 : -40;
+
+                monsters.push({
+                    x: x,
+                    y: y,
+                    w: 35,
+                    h: 40,
+                    health: 30 + (level * 10),
+                    maxHealth: 30 + (level * 10),
+                    speed: 1 + (level * 0.3),
+                    type: level,
+                    attackCooldown: 0
+                })
+            }
+
+            function spawnBoss() {
+                bossActive = true;
+                boss = {
+                    x: 500,
+                    y: 100,
+                    w: 80,
+                    h: 100,
+                    health: 200 + (level * 100),
+                    maxHealth: 200 + (level * 100),
+                    attackTimer: 0,
+                    moveTimer: 0,
+                    vx: 0,
+                    vy: 1,
+                    level: level
+                };
+            }
+
+            function drawHealthBar(x, y, width, health, maxHealth) {
+                ctx.fillStyle = '#000';
+                ctx.fillRect(x, y - 8, width, 5);
+                ctx.fillStyle = '#FF0000';
+                ctx.fillRect(x, y - 8, width, 5);
+                ctx.fillStyle = '#00FF00';
+                ctx.fillRect(x, y - 8, (health / maxHealth) * width, 5);
+            }
+
+            function drawPlayer() {
+                animFrame++;
+
+                //Drawhealth bar above player
+                drawHealthBar(player.x - 10, player.y - 10, 50, player.health,player.maxHealth);
+
+                // Ivincibility flash
+                if (player.invincible > 0 && Math.floor(animFrame / 5) % 2 === 0) {
+                    ctx.globalAlpha = 0.5
+                }
+            }
+        </script>
+    </body>
+</html>
